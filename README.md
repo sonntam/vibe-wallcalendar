@@ -69,9 +69,41 @@ services:
     docker-compose up -d
     ```
 
-### Option 3: Run from Source
+### Option 3: Run from Remote Source (No Clone)
 
-If you want to modify the code or run the latest unreleased changes:
+Build and run the latest code directly from GitHub without manually cloning the repository.
+
+1.  Create a `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+services:
+  wallcalendar:
+    # Build directly from the main branch of the repository
+    # The #:app suffix tells Docker to use the 'app' subdirectory as the build context
+    build: https://github.com/sonntam/vibe-wallcalendar.git#:app
+    container_name: vibe-wallcalendar
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - ICLOUD_USERNAME=your_email@example.com
+      - ICLOUD_PASSWORD=your_app_specific_password
+      - ICLOUD_URL=https://caldav.icloud.com/
+      - CALENDAR_NAME=Home
+      - TIMEZONE=Europe/Berlin
+      - DAYS_TO_SHOW=5
+      - LANGUAGE=en
+```
+
+2.  Run:
+    ```bash
+    docker-compose up -d --build
+    ```
+
+### Option 4: Run from Source (Manual Clone)
+
+If you want to modify the code or run specific unreleased changes:
 
 1.  Clone the repository:
     ```bash
