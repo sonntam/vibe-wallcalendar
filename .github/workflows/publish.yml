@@ -44,4 +44,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # Recommended for multi-arch support if you ever need it in the future
-          platforms: linux/amd64,linux/arm64,windows/amd64
+          platforms: linux/amd64,linux/arm64
