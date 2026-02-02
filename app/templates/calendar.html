@@ -32,6 +32,7 @@
              onclick="showDetails(this)"
              data-summary="{{ event.summary }}"
              data-time="{{ event.time_str }}"
+             data-date-range="{{ event.date_range }}"
              data-end-time=""
              data-description="{{ event.description }}"
              data-location="{{ event.location }}">
@@ -87,14 +88,20 @@
         var summary = element.getAttribute('data-summary');
         var time = element.getAttribute('data-time');
         var endTime = element.getAttribute('data-end-time');
+        var dateRange = element.getAttribute('data-date-range');
         var description = element.getAttribute('data-description');
         var location = element.getAttribute('data-location');
 
         document.getElementById('modal-summary').innerText = summary;
         
-        var displayTime = time;
-        if (endTime) {
-            displayTime += " - " + endTime;
+        var displayTime = "";
+        if (dateRange) {
+             displayTime = dateRange + " (" + time + ")";
+        } else {
+            displayTime = time;
+            if (endTime) {
+                displayTime += " - " + endTime;
+            }
         }
         document.getElementById('modal-time').innerText = displayTime;
 

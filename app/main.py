@@ -309,6 +309,19 @@ def calendar():
             rows.append(ev['end'])
             assigned_row = len(rows) - 1
             
+        # Format Date Range for Details
+        # ev['start'] and ev['end'] are date objects (exclusive end)
+        # Convert inclusive end for display
+        inclusive_end = ev['end'] - datetime.timedelta(days=1)
+        
+        start_str = dates.format_date(ev['start'], format='MMM d', locale=LANGUAGE)
+        end_str = dates.format_date(inclusive_end, format='MMM d', locale=LANGUAGE)
+        
+        if ev['start'] == inclusive_end:
+            date_range_str = start_str
+        else:
+            date_range_str = f"{start_str} - {end_str}"
+            
         # Add to list with layout info
         processed_all_day.append({
             'summary': ev['summary'],
@@ -319,7 +332,8 @@ def calendar():
             'row': assigned_row + 1, # CSS Grid rows are 1-based
             'is_left': is_continuation_left,
             'is_right': is_continuation_right,
-            'time_str': translations.get_text(LANGUAGE, 'all_day')
+            'time_str': translations.get_text(LANGUAGE, 'all_day'),
+            'date_range': date_range_str
         })
 
     # Structure data for template
