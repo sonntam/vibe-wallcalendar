@@ -56,4 +56,6 @@ Environment variables in `docker-compose.yml`:
 *   `ICLOUD_URL`: Defaults to `https://caldav.icloud.com/`.
 *   `TIMEZONE`: Defaults to `Europe/Berlin`.
 *   `DAYS_TO_SHOW`: Number of days to display (default: 5).
+*   `LATITUDE`: (Optional) Latitude for auto-theme switching (e.g., 52.5200).
+*   `LONGITUDE`: (Optional) Longitude for auto-theme switching (e.g., 13.4050).
 *   `CALENDAR_NAME`: (Optional) The specific calendar to fetch. If omitted, attempts to fetch from all or the primary.

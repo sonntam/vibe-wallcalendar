@@ -5,6 +5,8 @@ import caldav
 from flask import Flask, render_template, abort
 from dateutil import tz
 from dateutil.parser import parse
+from astral import LocationInfo
+from astral.sun import sun
 
 app = Flask(__name__)
 
@@ -19,6 +21,8 @@ ICLOUD_PASSWORD = os.environ.get('ICLOUD_PASSWORD')
 CALENDAR_NAME = os.environ.get('CALENDAR_NAME')
 TIMEZONE_STR = os.environ.get('TIMEZONE', 'Europe/Berlin')
 DAYS_TO_SHOW = int(os.environ.get('DAYS_TO_SHOW', 5))
+LATITUDE = os.environ.get('LATITUDE')
+LONGITUDE = os.environ.get('LONGITUDE')
 
 # Simple in-memory cache
 # Structure: {'timestamp': datetime, 'data': {...}}
@@ -27,6 +31,39 @@ CACHE_DURATION = 900  # 15 minutes in seconds
 
 def get_timezone():
     return tz.gettz(TIMEZONE_STR)
+
+def get_theme_mode():
+    """
+    Determines if the theme should be 'light' or 'dark' based on sun position.
+    Light mode: Sunrise + 45min < NOW < Sunset - 30min
+    """
+    if not LATITUDE or not LONGITUDE:
+        return 'dark' # Default fallback
+        
+    try:
+        local_tz = get_timezone()
+        now = datetime.datetime.now(local_tz)
+        
+        # Setup location
+        l = LocationInfo("Custom", "Region", TIMEZONE_STR, float(LATITUDE), float(LONGITUDE))
+        
+        # Calculate sun events
+        s = sun(l.observer, date=now.date(), tzinfo=local_tz)
+        sunrise = s['sunrise']
+        sunset = s['sunset']
+        
+        # Define window
+        light_start = sunrise + datetime.timedelta(minutes=45)
+        light_end = sunset - datetime.timedelta(minutes=30)
+        
+        if light_start < now < light_end:
+            return 'light'
+        else:
+            return 'dark'
+            
+    except Exception as e:
+        logger.error(f"Error calculating theme: {e}")
+        return 'dark'
 
 def get_date_range():
     """Returns a list of datetime.date objects for the configured range (default 5 days)"""
@@ -167,6 +204,7 @@ def fetch_events():
 
 @app.route('/')
 def calendar():
+    theme = get_theme_mode()
     days_to_show = get_date_range() # List of 5 date objects
     events_by_date = fetch_events()
     
@@ -193,7 +231,7 @@ def calendar():
             'events': day_events
         })
         
-    return render_template('calendar.html', columns=columns)
+    return render_template('calendar.html', columns=columns, theme=theme)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

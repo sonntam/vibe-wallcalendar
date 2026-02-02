@@ -15,3 +15,5 @@ services:
       - TIMEZONE=Europe/Berlin
       - TZ=Europe/Berlin
       - DAYS_TO_SHOW=5
+      - LATITUDE=48.723767
+      - LONGITUDE=8.982838

@@ -9,6 +9,33 @@
     --border-color: #404040;
 }
 
+body.light {
+    --bg-color: #f0f0f0;
+    --text-color: #222222;
+    --card-bg: #ffffff;
+    --today-highlight: #2962ff;
+    --today-bg: #e3f2fd; /* Very light blue */
+    --event-bg: #ffffff;
+    --event-time-color: #555555;
+    --border-color: #cccccc;
+}
+
+body.light .header {
+    background-color: rgba(255,255,255,0.6);
+}
+
+body.light .date-str {
+    color: #666666;
+}
+
+body.light .today .day-name {
+    color: #2962ff;
+}
+
+body.light .events-container {
+    scrollbar-color: #ccc #f0f0f0;
+}
+
 body {
     margin: 0;
     padding: 0;
