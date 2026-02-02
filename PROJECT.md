@@ -33,19 +33,63 @@ A lightweight, self-hosted wall calendar specifically designed for older hardwar
 
 ### Installation
 
-1.  Clone this repository.
-2.  Create a `.env` file (or modify `docker-compose.yml` directly) with your credentials:
+#### Option 1: Docker (Recommended)
+You can run the pre-built image directly from GitHub Container Registry.
+
+1.  Create a `docker-compose.yml` file:
+    ```yaml
+    version: '3.8'
+    services:
+      wallcalendar:
+        image: ghcr.io/sonntam/vibe-wallcalendar:latest
+        container_name: vibe-wallcalendar
+        restart: unless-stopped
+        ports:
+          - "5000:5000"
+        env_file:
+          - secrets.env
+        environment:
+          - ICLOUD_URL=https://caldav.icloud.com/
+          - CALENDAR_NAME=Home
+          - TIMEZONE=Europe/Berlin
+          - DAYS_TO_SHOW=5
+          - LANGUAGE=de
+          - LATITUDE=52.5200
+          - LONGITUDE=13.4050
+    ```
+2.  Create a `secrets.env` file with your credentials:
     ```bash
     ICLOUD_USERNAME=your_email@example.com
     ICLOUD_PASSWORD=your_app_specific_password
-    CALENDAR_NAME=Home  # Optional: specific calendar name, otherwise defaults to primary
-    TIMEZONE=Europe/Berlin
     ```
+3.  Start the container:
+    ```bash
+    docker-compose up -d
+    ```
+
+#### Option 2: Build from Source
+1.  Clone this repository.
+2.  Create a `secrets.env` file (or modify `docker-compose.yml` directly) with your credentials.
 3.  Run the container:
     ```bash
     docker-compose up -d --build
     ```
 4.  Open your browser to `http://<server-ip>:5000`.
+
+## Releasing (For Maintainers)
+
+This project uses **Conventional Commits** to automate releases. When contributing, please format your commit messages as follows:
+
+*   `feat: ...` for a new feature (triggers a MINOR version update).
+*   `fix: ...` for a bug fix (triggers a PATCH version update).
+*   `feat!: ...` or `fix!: ...` (exclamation mark) signals a **BREAKING CHANGE** and triggers a **MAJOR** version update.
+*   `chore: ...` for maintenance tasks (no release).
+
+**Workflow:**
+1.  Push changes to `main`.
+2.  A "Release PR" will be automatically created/updated by the `release-please` bot.
+3.  Merge the Release PR to trigger a new release.
+4.  This automatically builds and pushes the Docker image to `ghcr.io`.
 
 ## Configuration
 
