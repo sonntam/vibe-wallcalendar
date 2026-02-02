@@ -61,6 +61,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    border-top: 4px solid transparent; /* Reserve space for alignment */
 }
 
 .day-column:last-child {
