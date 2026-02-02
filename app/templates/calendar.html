@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Family Calendar</title>
+    <!-- Viewport optimized for tablet -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Refresh every 15 minutes (900 seconds) -->
+    <meta http-equiv="refresh" content="900">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    {% for col in columns %}
+    <div class="day-column {% if col.is_today %}today{% endif %}">
+        <div class="header">
+            <span class="day-name">
+                {% if col.is_today %}TODAY{% else %}{{ col.day_name }}{% endif %}
+            </span>
+            <span class="date-str">{{ col.date_str }}</span>
+        </div>
+        
+        <div class="events-container">
+            {% if col.events %}
+                {% for event in col.events %}
+                <div class="event-card">
+                    <span class="event-time">{{ event.time }}</span>
+                    <span class="event-summary">{{ event.summary }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-events">No events</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>

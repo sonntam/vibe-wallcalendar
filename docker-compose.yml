@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  wallcalendar:
+    build: ./app
+    container_name: vibe-wallcalendar
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - secrets.env
+    environment:
+      - ICLOUD_URL=https://caldav.icloud.com/
+      - CALENDAR_NAME=Familie
+      - TIMEZONE=Europe/Berlin
+      - TZ=Europe/Berlin
+      - DAYS_TO_SHOW=5
