@@ -58,4 +58,5 @@ Environment variables in `docker-compose.yml`:
 *   `DAYS_TO_SHOW`: Number of days to display (default: 5).
 *   `LATITUDE`: (Optional) Latitude for auto-theme switching (e.g., 52.5200).
 *   `LONGITUDE`: (Optional) Longitude for auto-theme switching (e.g., 13.4050).
+*   `LANGUAGE`: (Optional) Language code for UI strings and date formatting (default: `en`, options: `en`, `de`).
 *   `CALENDAR_NAME`: (Optional) The specific calendar to fetch. If omitted, attempts to fetch from all or the primary.

@@ -16,7 +16,7 @@
     <div class="day-column {% if col.is_today %}today{% endif %}">
         <div class="header">
             <span class="day-name">
-                {% if col.is_today %}TODAY{% else %}{{ col.day_name }}{% endif %}
+                {{ col.day_name }}
             </span>
             <span class="date-str">{{ col.date_str }}</span>
         </div>
@@ -30,7 +30,7 @@
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="no-events">No events</div>
+                <div class="no-events">{{ no_events_text }}</div>
             {% endif %}
         </div>
     </div>

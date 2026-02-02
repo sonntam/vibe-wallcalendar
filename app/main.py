@@ -7,6 +7,8 @@ from dateutil import tz
 from dateutil.parser import parse
 from astral import LocationInfo
 from astral.sun import sun
+from babel import dates
+import translations
 
 app = Flask(__name__)
 
@@ -23,6 +25,7 @@ TIMEZONE_STR = os.environ.get('TIMEZONE', 'Europe/Berlin')
 DAYS_TO_SHOW = int(os.environ.get('DAYS_TO_SHOW', 5))
 LATITUDE = os.environ.get('LATITUDE')
 LONGITUDE = os.environ.get('LONGITUDE')
+LANGUAGE = os.environ.get('LANGUAGE', os.environ.get('LANG', 'en')).split('.')[0]
 
 # Simple in-memory cache
 # Structure: {'timestamp': datetime, 'data': {...}}
@@ -214,13 +217,21 @@ def calendar():
     columns = []
     today = datetime.datetime.now(get_timezone()).date()
     
+    no_events_text = translations.get_text(LANGUAGE, 'no_events')
+
     for day in days_to_show:
         is_today = (day == today)
         
-        # Format: "Monday"
-        day_name = day.strftime("%A")
-        # Format: "Feb 02"
-        date_str = day.strftime("%b %d")
+        # Determine day name (e.g. "Monday" or "HEUTE")
+        if is_today:
+             day_name = translations.get_text(LANGUAGE, 'today')
+        else:
+             # Babel formatting: 'EEEE' = full weekday name
+             day_name = dates.format_date(day, format='EEEE', locale=LANGUAGE).upper()
+
+        # Format date: "Feb 02" or localized "2. Feb."
+        # Babel 'MMM d' handles locale specific order
+        date_str = dates.format_date(day, format='MMM d', locale=LANGUAGE)
         
         day_events = events_by_date.get(day, [])
         
@@ -231,7 +242,7 @@ def calendar():
             'events': day_events
         })
         
-    return render_template('calendar.html', columns=columns, theme=theme)
+    return render_template('calendar.html', columns=columns, theme=theme, no_events_text=no_events_text)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
