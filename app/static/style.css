@@ -20,7 +20,7 @@ body.light {
     --border-color: #cccccc;
 }
 
-body.light .header {
+body.light .header-cell {
     background-color: rgba(255,255,255,0.6);
 }
 
@@ -50,34 +50,34 @@ body {
 
 .container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     height: 100%;
     width: 100%;
 }
 
-.day-column {
-    flex: 1; /* Equal width (20%) */
-    border-right: 1px solid var(--border-color);
+.header-row {
     display: flex;
-    flex-direction: column;
-    height: 100%;
-    border-top: 4px solid transparent; /* Reserve space for alignment */
+    flex-direction: row;
+    flex: 0 0 auto;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.day-column:last-child {
-    border-right: none;
-}
-
-.day-column.today {
-    background-color: var(--today-bg);
-    border-top: 4px solid var(--today-highlight);
-}
-
-.header {
+.header-cell {
+    flex: 1;
     padding: 15px;
     text-align: center;
     background-color: rgba(0,0,0,0.2);
-    border-bottom: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-top: 4px solid transparent;
+}
+
+.header-cell:last-child {
+    border-right: none;
+}
+
+.header-cell.today {
+    background-color: var(--today-bg);
+    border-top: 4px solid var(--today-highlight);
 }
 
 .day-name {
@@ -98,9 +98,87 @@ body {
     color: #8c9eff; /* Lighter blue */
 }
 
+/* All Day Grid */
+.all-day-grid {
+    display: grid;
+    gap: 4px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-color);
+    flex: 0 0 auto;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.all-day-card {
+    background-color: var(--event-bg);
+    border-left: 4px solid var(--today-highlight);
+    color: var(--text-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    margin: 0 2px;
+    position: relative;
+}
+
+.all-day-card.cont-left {
+    padding-left: 20px;
+}
+
+.all-day-card.cont-right {
+    padding-right: 20px;
+}
+
+.all-day-card.cont-left::before {
+    content: "◀";
+    opacity: 0.7;
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+}
+
+.all-day-card.cont-right::after {
+    content: "▶";
+    opacity: 0.7;
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+}
+
+/* Timeline Body */
+.timeline-body {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+}
+
+.day-column {
+    flex: 1;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.day-column:last-child {
+    border-right: none;
+}
+
+.day-column.today {
+    background-color: var(--today-bg);
+}
+
 .events-container {
     padding: 10px;
-    overflow-y: auto; /* Allow scrolling inside the day if too many events */
+    overflow-y: auto;
     flex-grow: 1;
 }
 
@@ -152,12 +230,12 @@ body {
     left: 10px;
     right: 10px;
     bottom: 10px;
-    background-color: rgba(0,0,0,0.85); /* Dark semi-transparent dim */
+    background-color: rgba(0,0,0,0.85);
     z-index: 1000;
-    display: none; /* Toggled by JS */
+    display: none;
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0,0,0,0.8);
-    backdrop-filter: blur(2px); /* Nice touch if supported, harmless if not */
+    backdrop-filter: blur(2px);
 }
 
 /* Modal Content Container */
@@ -220,7 +298,7 @@ body {
 .modal-desc {
     font-size: 1.3rem;
     line-height: 1.6;
-    white-space: pre-wrap; /* Preserve line breaks from description */
+    white-space: pre-wrap;
 }
 
 /* Light Theme Overrides for Modal */

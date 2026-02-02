@@ -12,35 +12,61 @@
 <body class="{{ theme }}">
 
 <div class="container">
-    {% for col in columns %}
-    <div class="day-column {% if col.is_today %}today{% endif %}">
-        <div class="header">
-            <span class="day-name">
-                {{ col.day_name }}
-            </span>
+    
+    <!-- Header Row -->
+    <div class="header-row">
+        {% for col in columns %}
+        <div class="header-cell {% if col.is_today %}today{% endif %}">
+            <span class="day-name">{{ col.day_name }}</span>
             <span class="date-str">{{ col.date_str }}</span>
         </div>
-        
-        <div class="events-container">
-            {% if col.events %}
-                {% for event in col.events %}
-                <div class="event-card" 
-                     onclick="showDetails(this)"
-                     data-summary="{{ event.summary }}"
-                     data-time="{{ event.time }}"
-                     data-end-time="{{ event.end_time }}"
-                     data-description="{{ event.description }}"
-                     data-location="{{ event.location }}">
-                    <span class="event-time">{{ event.time }}</span>
-                    <span class="event-summary">{{ event.summary }}</span>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="no-events">{{ no_events_text }}</div>
-            {% endif %}
-        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+
+    <!-- All-Day Events Grid -->
+    {% if all_day_events %}
+    <div class="all-day-grid" style="grid-template-columns: repeat({{ columns|length }}, 1fr);">
+        {% for event in all_day_events %}
+        <div class="all-day-card {% if event.is_left %}cont-left{% endif %} {% if event.is_right %}cont-right{% endif %}"
+             style="grid-column: {{ event.col_start }} / span {{ event.col_span }}; grid-row: {{ event.row }};"
+             onclick="showDetails(this)"
+             data-summary="{{ event.summary }}"
+             data-time="{{ event.time_str }}"
+             data-end-time=""
+             data-description="{{ event.description }}"
+             data-location="{{ event.location }}">
+            {{ event.summary }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Timeline Body -->
+    <div class="timeline-body">
+        {% for col in columns %}
+        <div class="day-column {% if col.is_today %}today{% endif %}">
+            <div class="events-container">
+                {% if col.events %}
+                    {% for event in col.events %}
+                    <div class="event-card" 
+                         onclick="showDetails(this)"
+                         data-summary="{{ event.summary }}"
+                         data-time="{{ event.time }}"
+                         data-end-time="{{ event.end_time }}"
+                         data-description="{{ event.description }}"
+                         data-location="{{ event.location }}">
+                        <span class="event-time">{{ event.time }}</span>
+                        <span class="event-summary">{{ event.summary }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-events">{{ no_events_text }}</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
 
 <!-- Details Modal Overlay -->

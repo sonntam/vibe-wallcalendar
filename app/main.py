@@ -136,7 +136,10 @@ def fetch_events():
         # date_search expects datetime objects
         results = target_calendar.date_search(start=start_dt, end=end_dt, expand=True)
         
-        events_by_date = {}
+        data = {
+            'timed': {},
+            'all_day': []
+        }
         
         for event in results:
             # Parse the vObject
@@ -162,23 +165,14 @@ def fetch_events():
             if hasattr(ical_data, 'dtend'):
                 dtend = ical_data.dtend.value
             else:
-                # If no end, assume 1 hour duration or all day depending on type
-                if isinstance(dtstart, datetime.datetime):
-                    dtend = dtstart + datetime.timedelta(hours=1)
-                else:
-                    dtend = dtstart # Single day event
-            
+                dtend = None
+
             # Normalize to local timezone for display
-            # If it's a date object (all day), keep it as date
-            # If it's datetime, convert to local
-            
             is_all_day = not isinstance(dtstart, datetime.datetime)
             
             if not is_all_day:
                 # Ensure timezone awareness
                 if dtstart.tzinfo is None:
-                    # Naive, assume local? Or UTC? 
-                    # Usually ical is UTC if ends in Z. 
                     dtstart = dtstart.replace(tzinfo=tz.UTC)
                 
                 dtstart_local = dtstart.astimezone(local_tz)
@@ -187,40 +181,56 @@ def fetch_events():
                 
                 # Handle End Time formatting
                 if dtend:
-                    if dtend.tzinfo is None:
-                        dtend = dtend.replace(tzinfo=tz.UTC)
-                    dtend_local = dtend.astimezone(local_tz)
-                    end_time_str = dtend_local.strftime("%H:%M")
+                    if isinstance(dtend, datetime.datetime):
+                        if dtend.tzinfo is None:
+                            dtend = dtend.replace(tzinfo=tz.UTC)
+                        dtend_local = dtend.astimezone(local_tz)
+                        end_time_str = dtend_local.strftime("%H:%M")
+                    else:
+                         end_time_str = ""
                 else:
-                    end_time_str = ""
+                    # Assume 1 hour
+                    end_time_str = (dtstart_local + datetime.timedelta(hours=1)).strftime("%H:%M")
+
+                # Store timed event
+                if date_key not in data['timed']:
+                    data['timed'][date_key] = []
+                    
+                data['timed'][date_key].append({
+                    'summary': summary,
+                    'description': description,
+                    'location': location,
+                    'time': time_str,
+                    'end_time': end_time_str,
+                    'is_all_day': False,
+                    'sort_key': dtstart_local
+                })
 
             else:
-                date_key = dtstart
-                time_str = translations.get_text(LANGUAGE, 'all_day')
-                end_time_str = ""
-
-            # Store
-            if date_key not in events_by_date:
-                events_by_date[date_key] = []
+                # All Day Event
+                if not dtend:
+                    dtend = dtstart + datetime.timedelta(days=1)
+                elif dtend == dtstart:
+                     # Some clients might set start=end for single day, though spec says exclusive
+                     dtend = dtstart + datetime.timedelta(days=1)
                 
-            events_by_date[date_key].append({
-                'summary': summary,
-                'description': description,
-                'location': location,
-                'time': time_str,
-                'end_time': end_time_str,
-                'is_all_day': is_all_day,
-                'sort_key': dtstart if not is_all_day else datetime.datetime.combine(dtstart, datetime.time.min).replace(tzinfo=local_tz)
-            })
+                data['all_day'].append({
+                    'summary': summary,
+                    'description': description,
+                    'location': location,
+                    'start': dtstart,
+                    'end': dtend,
+                    'is_all_day': True
+                })
 
-        # Sort events within days
-        for day in events_by_date:
-            events_by_date[day].sort(key=lambda x: x['sort_key'])
+        # Sort timed events within days
+        for day in data['timed']:
+            data['timed'][day].sort(key=lambda x: x['sort_key'])
 
         # Update Cache
         CACHE['timestamp'] = now
-        CACHE['data'] = events_by_date
-        return events_by_date
+        CACHE['data'] = data
+        return data
 
     except Exception as e:
         logger.error(f"Error fetching calendar: {e}")
@@ -233,11 +243,86 @@ def fetch_events():
 def calendar():
     theme = get_theme_mode()
     days_to_show = get_date_range() # List of 5 date objects
-    events_by_date = fetch_events()
     
+    # Range for all-day calculation
+    view_start = days_to_show[0]
+    view_end = days_to_show[-1] + datetime.timedelta(days=1) # Exclusive
+    
+    fetched_data = fetch_events()
+    timed_events = fetched_data.get('timed', {})
+    raw_all_day = fetched_data.get('all_day', [])
+    
+    # Process All Day Events (Bin Packing)
+    # Filter overlapping events
+    visible_all_day = []
+    for ev in raw_all_day:
+        # Check overlap: start < view_end AND end > view_start
+        if ev['start'] < view_end and ev['end'] > view_start:
+            visible_all_day.append(ev)
+            
+    # Sort by start date, then duration (desc)
+    visible_all_day.sort(key=lambda x: (x['start'], (x['start'] - x['end']).days))
+    
+    # Assign Rows
+    # rows is a list of lists: [[end_date_of_last_event_in_row, ...], ...]
+    # We store the end date of the last event in that row.
+    rows = [] 
+    
+    processed_all_day = []
+    
+    for ev in visible_all_day:
+        # Calculate visual start/end (clamped to view)
+        
+        # Grid Column Start (1-based)
+        # If starts before view, start at 1
+        if ev['start'] < view_start:
+            col_start = 1
+            is_continuation_left = True
+        else:
+            col_start = (ev['start'] - view_start).days + 1
+            is_continuation_left = False
+            
+        # Grid Column End (Exclusive)
+        if ev['end'] > view_end:
+            # Spans beyond view
+            col_end = len(days_to_show) + 1 # +1 because grid lines are 1-based, 6 lines for 5 cols
+            is_continuation_right = True
+        else:
+            col_end = (ev['end'] - view_start).days + 1
+            is_continuation_right = False
+            
+        col_span = col_end - col_start
+        
+        # Find a row
+        assigned_row = -1
+        for i, row_end in enumerate(rows):
+            # Check if this row is free after row_end
+            # We need strictly greater because if prev ends at today 00:00, next can start today 00:00
+            # Wait, ev['start'] must be >= row_end
+            if ev['start'] >= row_end:
+                assigned_row = i
+                rows[i] = ev['end']
+                break
+        
+        if assigned_row == -1:
+            # Create new row
+            rows.append(ev['end'])
+            assigned_row = len(rows) - 1
+            
+        # Add to list with layout info
+        processed_all_day.append({
+            'summary': ev['summary'],
+            'description': ev['description'],
+            'location': ev['location'],
+            'col_start': col_start,
+            'col_span': col_span,
+            'row': assigned_row + 1, # CSS Grid rows are 1-based
+            'is_left': is_continuation_left,
+            'is_right': is_continuation_right,
+            'time_str': translations.get_text(LANGUAGE, 'all_day')
+        })
+
     # Structure data for template
-    # list of dicts: {'date_obj': date, 'day_name': 'Mon', 'day_str': '02.02', 'events': []}
-    
     columns = []
     today = datetime.datetime.now(get_timezone()).date()
     
@@ -257,7 +342,7 @@ def calendar():
         # Babel 'MMM d' handles locale specific order
         date_str = dates.format_date(day, format='MMM d', locale=LANGUAGE)
         
-        day_events = events_by_date.get(day, [])
+        day_events = timed_events.get(day, [])
         
         columns.append({
             'is_today': is_today,
@@ -266,7 +351,7 @@ def calendar():
             'events': day_events
         })
         
-    return render_template('calendar.html', columns=columns, theme=theme, no_events_text=no_events_text)
+    return render_template('calendar.html', columns=columns, all_day_events=processed_all_day, theme=theme, no_events_text=no_events_text)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
