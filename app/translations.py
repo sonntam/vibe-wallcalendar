@@ -5,11 +5,13 @@
 TRANSLATIONS = {
     'en': {
         'today': 'TODAY',
-        'no_events': 'No events'
+        'no_events': 'No events',
+        'all_day': 'All Day'
     },
     'de': {
         'today': 'HEUTE',
-        'no_events': 'Keine Termine'
+        'no_events': 'Keine Termine',
+        'all_day': 'Ganztägig'
     }
 }
 

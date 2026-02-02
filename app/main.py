@@ -196,7 +196,7 @@ def fetch_events():
 
             else:
                 date_key = dtstart
-                time_str = "All Day"
+                time_str = translations.get_text(LANGUAGE, 'all_day')
                 end_time_str = ""
 
             # Store
