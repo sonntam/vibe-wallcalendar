@@ -143,3 +143,96 @@ body {
     margin-top: 40px;
     font-style: italic;
 }
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background-color: rgba(0,0,0,0.85); /* Dark semi-transparent dim */
+    z-index: 1000;
+    display: none; /* Toggled by JS */
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    backdrop-filter: blur(2px); /* Nice touch if supported, harmless if not */
+}
+
+/* Modal Content Container */
+.modal-content {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 30px;
+    border-radius: 8px;
+    position: relative;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--text-color);
+    cursor: pointer;
+    line-height: 1;
+    z-index: 1010;
+}
+
+.close-btn:active {
+    color: var(--today-highlight);
+}
+
+/* Modal Text Styling */
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: var(--today-highlight);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+.modal-meta {
+    margin-bottom: 25px;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+.modal-time {
+    font-weight: bold;
+    color: var(--text-color);
+    margin-right: 15px;
+}
+
+.modal-location {
+    color: var(--today-highlight);
+}
+
+.modal-desc {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    white-space: pre-wrap; /* Preserve line breaks from description */
+}
+
+/* Light Theme Overrides for Modal */
+body.light .modal-overlay {
+    background-color: rgba(255,255,255,0.7);
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+body.light .modal-content {
+    border-color: #ccc;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+body.light .modal-meta {
+    color: #666;
+}

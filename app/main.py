@@ -145,6 +145,16 @@ def fetch_events():
             
             summary = str(ical_data.summary.value)
             
+            # Extract Description (optional)
+            description = ""
+            if hasattr(ical_data, 'description'):
+                description = str(ical_data.description.value)
+
+            # Extract Location (optional)
+            location = ""
+            if hasattr(ical_data, 'location'):
+                location = str(ical_data.location.value)
+            
             # Handle Start Time
             dtstart = ical_data.dtstart.value
             
@@ -174,9 +184,20 @@ def fetch_events():
                 dtstart_local = dtstart.astimezone(local_tz)
                 date_key = dtstart_local.date()
                 time_str = dtstart_local.strftime("%H:%M")
+                
+                # Handle End Time formatting
+                if dtend:
+                    if dtend.tzinfo is None:
+                        dtend = dtend.replace(tzinfo=tz.UTC)
+                    dtend_local = dtend.astimezone(local_tz)
+                    end_time_str = dtend_local.strftime("%H:%M")
+                else:
+                    end_time_str = ""
+
             else:
                 date_key = dtstart
                 time_str = "All Day"
+                end_time_str = ""
 
             # Store
             if date_key not in events_by_date:
@@ -184,7 +205,10 @@ def fetch_events():
                 
             events_by_date[date_key].append({
                 'summary': summary,
+                'description': description,
+                'location': location,
                 'time': time_str,
+                'end_time': end_time_str,
                 'is_all_day': is_all_day,
                 'sort_key': dtstart if not is_all_day else datetime.datetime.combine(dtstart, datetime.time.min).replace(tzinfo=local_tz)
             })

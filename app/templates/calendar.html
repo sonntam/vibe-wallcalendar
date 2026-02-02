@@ -24,7 +24,13 @@
         <div class="events-container">
             {% if col.events %}
                 {% for event in col.events %}
-                <div class="event-card">
+                <div class="event-card" 
+                     onclick="showDetails(this)"
+                     data-summary="{{ event.summary }}"
+                     data-time="{{ event.time }}"
+                     data-end-time="{{ event.end_time }}"
+                     data-description="{{ event.description }}"
+                     data-location="{{ event.location }}">
                     <span class="event-time">{{ event.time }}</span>
                     <span class="event-summary">{{ event.summary }}</span>
                 </div>
@@ -36,6 +42,53 @@
     </div>
     {% endfor %}
 </div>
+
+<!-- Details Modal Overlay -->
+<div id="modal-overlay" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeDetails()">&times;</span>
+        <h2 id="modal-summary"></h2>
+        <div class="modal-meta">
+            <span id="modal-time" class="modal-time"></span>
+            <span id="modal-location" class="modal-location"></span>
+        </div>
+        <div id="modal-desc" class="modal-desc"></div>
+    </div>
+</div>
+
+<script>
+    function showDetails(element) {
+        var summary = element.getAttribute('data-summary');
+        var time = element.getAttribute('data-time');
+        var endTime = element.getAttribute('data-end-time');
+        var description = element.getAttribute('data-description');
+        var location = element.getAttribute('data-location');
+
+        document.getElementById('modal-summary').innerText = summary;
+        
+        var displayTime = time;
+        if (endTime) {
+            displayTime += " - " + endTime;
+        }
+        document.getElementById('modal-time').innerText = displayTime;
+
+        document.getElementById('modal-desc').innerText = description;
+        
+        var locSpan = document.getElementById('modal-location');
+        if (location) {
+            locSpan.innerText = "📍 " + location;
+            locSpan.style.display = 'inline';
+        } else {
+            locSpan.style.display = 'none';
+        }
+
+        document.getElementById('modal-overlay').style.display = 'block';
+    }
+
+    function closeDetails() {
+        document.getElementById('modal-overlay').style.display = 'none';
+    }
+</script>
 
 </body>
 </html>
