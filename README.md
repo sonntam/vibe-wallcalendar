@@ -129,19 +129,19 @@ If you want to modify the code or run specific unreleased changes:
 
 The application is configured entirely via Environment Variables.
 
-| Variable | Required | Default | Description |
+| Variable | Optional | Default | Description |
 | :--- | :---: | :--- | :--- |
-| `ICLOUD_USERNAME` | ✅ | - | Your Apple ID email address. |
-| `ICLOUD_PASSWORD` | ✅ | - | An **App-Specific Password** (Generate at [appleid.apple.com](https://appleid.apple.com)). |
-| `ICLOUD_URL` | ❌ | `https://caldav.icloud.com/` | The CalDAV server URL. |
-| `CALENDARS` | ❌ | - | List of calendars to fetch with optional colors. Format: `"Name:Color, Name2"`. |
-| `CALENDAR_NAME` | ❌ | (First found) | **Legacy**: The display name of a single calendar to fetch. Used if `CALENDARS` is unset. |
-| `TIMEZONE` | ❌ | `Europe/Berlin` | The timezone for the calendar view (e.g., `America/New_York`). |
-| `DAYS_TO_SHOW` | ❌ | `5` | Number of columns/days to display in the view. |
-| `LANGUAGE` | ❌ | `en` | Interface language (`en` or `de`). |
-| `THEME` | ❌ | `auto` | Force theme: `light`, `dark`, or `auto`. |
-| `LATITUDE` | ❌ | - | Decimal latitude for calculating sunrise/sunset (Auto-Theme). |
-| `LONGITUDE` | ❌ | - | Decimal longitude for calculating sunrise/sunset (Auto-Theme). |
+| `ICLOUD_USERNAME` | ❌ | - | Your Apple ID email address. |
+| `ICLOUD_PASSWORD` | ❌ | - | An **App-Specific Password** (Generate at [appleid.apple.com](https://appleid.apple.com)). |
+| `ICLOUD_URL` | ✅ | `https://caldav.icloud.com/` | The CalDAV server URL. |
+| `CALENDARS` | ✅ | - | List of calendars to fetch with optional colors. Format: `"Name:Color, Name2"`. |
+| `CALENDAR_NAME` | ✅ | (First found) | **Legacy**: The display name of a single calendar to fetch. Used if `CALENDARS` is unset. |
+| `TIMEZONE` | ✅ | `Europe/Berlin` | The timezone for the calendar view (e.g., `America/New_York`). |
+| `DAYS_TO_SHOW` | ✅ | `5` | Number of columns/days to display in the view. |
+| `LANGUAGE` | ✅ | `en` | Interface language (`en` or `de`). |
+| `THEME` | ✅ | `auto` | Force theme: `light`, `dark`, or `auto`. |
+| `LATITUDE` | ✅ | - | Decimal latitude for calculating sunrise/sunset (Auto-Theme). |
+| `LONGITUDE` | ✅ | - | Decimal longitude for calculating sunrise/sunset (Auto-Theme). |
 
 ### Note on Theming
 By default (`THEME=auto`), the application uses **Auto-Theme** logic:
