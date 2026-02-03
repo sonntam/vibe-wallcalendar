@@ -96,25 +96,33 @@ def parse_calendars_config():
     Parses CALENDARS env var or falls back to CALENDAR_NAME.
     Returns a dict: {'Calendar Name': 'ColorHex'}
     """
+    logger.info(f"Parsing config. CALENDARS='{CALENDARS_CONFIG}', CALENDAR_NAME='{CALENDAR_NAME}'")
     targets = {}
     
     if CALENDARS_CONFIG:
         # Parse comma separated list
         parts = [x.strip() for x in CALENDARS_CONFIG.split(',') if x.strip()]
+        logger.info(f"Found {len(parts)} config parts: {parts}")
+        
         for i, part in enumerate(parts):
             if ':' in part:
                 name, color = part.rsplit(':', 1)
                 targets[name.strip()] = color.strip()
+                logger.info(f"Parsed explicit color: {name.strip()} -> {color.strip()}")
             else:
                 # Assign default color based on index
                 color = DEFAULT_PALETTE[i % len(DEFAULT_PALETTE)]
                 targets[part.strip()] = color
+                logger.info(f"Assigned default color: {part.strip()} -> {color}")
                 
     elif CALENDAR_NAME:
         # Fallback to single legacy calendar
         targets[CALENDAR_NAME] = DEFAULT_PALETTE[0]
+        logger.info(f"Using legacy CALENDAR_NAME: {CALENDAR_NAME}")
         
+    logger.info(f"Final calendar configuration: {targets}")
     return targets
+
 
 def fetch_events():
     """
