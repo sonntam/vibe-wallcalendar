@@ -190,7 +190,12 @@ def fetch_events():
         # Search Range
         local_tz = get_timezone()
         dt_now = datetime.datetime.now(local_tz)
-        start_dt = dt_now - datetime.timedelta(days=1)
+        
+        # Start from the beginning of yesterday (matches get_date_range)
+        today = dt_now.date()
+        yesterday = today - datetime.timedelta(days=1)
+        start_dt = datetime.datetime.combine(yesterday, datetime.time.min, tzinfo=local_tz)
+        
         end_dt = dt_now + datetime.timedelta(days=DAYS_TO_SHOW)
 
         for target_calendar, color in calendars_to_fetch:
@@ -199,75 +204,80 @@ def fetch_events():
             
             for event in results:
                 # Parse the vObject
-                ical_data = event.instance.vevent
-                
-                summary = str(ical_data.summary.value)
-                
-                description = ""
-                if hasattr(ical_data, 'description'):
-                    description = str(ical_data.description.value)
+                # Handle single or multiple VEVENT components (expanded recurrence)
+                vevents = getattr(event.instance, 'vevent_list', [])
+                if not vevents and hasattr(event.instance, 'vevent'):
+                    # Fallback if list not found but single item exists (safety net)
+                    vevents = [event.instance.vevent]
 
-                location = ""
-                if hasattr(ical_data, 'location'):
-                    location = str(ical_data.location.value)
-                
-                dtstart = ical_data.dtstart.value
-                
-                if hasattr(ical_data, 'dtend'):
-                    dtend = ical_data.dtend.value
-                else:
-                    dtend = None
+                for ical_data in vevents:
+                    summary = str(ical_data.summary.value)
+                    
+                    description = ""
+                    if hasattr(ical_data, 'description'):
+                        description = str(ical_data.description.value)
 
-                is_all_day = not isinstance(dtstart, datetime.datetime)
-                
-                if not is_all_day:
-                    if dtstart.tzinfo is None:
-                        dtstart = dtstart.replace(tzinfo=tz.UTC)
+                    location = ""
+                    if hasattr(ical_data, 'location'):
+                        location = str(ical_data.location.value)
                     
-                    dtstart_local = dtstart.astimezone(local_tz)
-                    date_key = dtstart_local.date()
-                    time_str = dtstart_local.strftime("%H:%M")
+                    dtstart = ical_data.dtstart.value
                     
-                    if dtend:
-                        if isinstance(dtend, datetime.datetime):
-                            if dtend.tzinfo is None:
-                                dtend = dtend.replace(tzinfo=tz.UTC)
-                            dtend_local = dtend.astimezone(local_tz)
-                            end_time_str = dtend_local.strftime("%H:%M")
-                        else:
-                             end_time_str = ""
+                    if hasattr(ical_data, 'dtend'):
+                        dtend = ical_data.dtend.value
                     else:
-                        end_time_str = (dtstart_local + datetime.timedelta(hours=1)).strftime("%H:%M")
+                        dtend = None
 
-                    if date_key not in data['timed']:
-                        data['timed'][date_key] = []
-                        
-                    data['timed'][date_key].append({
-                        'summary': summary,
-                        'description': description,
-                        'location': location,
-                        'time': time_str,
-                        'end_time': end_time_str,
-                        'is_all_day': False,
-                        'sort_key': dtstart_local,
-                        'color': color  # Inject Color
-                    })
-
-                else:
-                    if not dtend:
-                        dtend = dtstart + datetime.timedelta(days=1)
-                    elif dtend == dtstart:
-                         dtend = dtstart + datetime.timedelta(days=1)
+                    is_all_day = not isinstance(dtstart, datetime.datetime)
                     
-                    data['all_day'].append({
-                        'summary': summary,
-                        'description': description,
-                        'location': location,
-                        'start': dtstart,
-                        'end': dtend,
-                        'is_all_day': True,
-                        'color': color # Inject Color
-                    })
+                    if not is_all_day:
+                        if dtstart.tzinfo is None:
+                            dtstart = dtstart.replace(tzinfo=tz.UTC)
+                        
+                        dtstart_local = dtstart.astimezone(local_tz)
+                        date_key = dtstart_local.date()
+                        time_str = dtstart_local.strftime("%H:%M")
+                        
+                        if dtend:
+                            if isinstance(dtend, datetime.datetime):
+                                if dtend.tzinfo is None:
+                                    dtend = dtend.replace(tzinfo=tz.UTC)
+                                dtend_local = dtend.astimezone(local_tz)
+                                end_time_str = dtend_local.strftime("%H:%M")
+                            else:
+                                 end_time_str = ""
+                        else:
+                            end_time_str = (dtstart_local + datetime.timedelta(hours=1)).strftime("%H:%M")
+
+                        if date_key not in data['timed']:
+                            data['timed'][date_key] = []
+                            
+                        data['timed'][date_key].append({
+                            'summary': summary,
+                            'description': description,
+                            'location': location,
+                            'time': time_str,
+                            'end_time': end_time_str,
+                            'is_all_day': False,
+                            'sort_key': dtstart_local,
+                            'color': color  # Inject Color
+                        })
+
+                    else:
+                        if not dtend:
+                            dtend = dtstart + datetime.timedelta(days=1)
+                        elif dtend == dtstart:
+                             dtend = dtstart + datetime.timedelta(days=1)
+                        
+                        data['all_day'].append({
+                            'summary': summary,
+                            'description': description,
+                            'location': location,
+                            'start': dtstart,
+                            'end': dtend,
+                            'is_all_day': True,
+                            'color': color # Inject Color
+                        })
 
         # Sort timed events within days
         for day in data['timed']:
