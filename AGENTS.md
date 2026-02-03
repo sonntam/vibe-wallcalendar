@@ -37,10 +37,12 @@ If working outside Docker, ensure Python 3.11+ is installed.
     ```
 
 ### Testing
-*Currently, no test suite is implemented.*
+
 *   **Agent Instruction**: When adding significant logic, **create unit tests** using `pytest`.
 *   **Future Command**: `pytest`
 *   **Running a Single Test**: `pytest tests/test_file.py::test_function_name`
+*   Tests should be located in the ./tests folder
+*   You may create or use a venv on the current host machine for testing
 
 ### Linting & Formatting
 Follow standard Python community guidelines.

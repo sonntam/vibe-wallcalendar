@@ -27,6 +27,7 @@ DAYS_TO_SHOW = int(os.environ.get('DAYS_TO_SHOW', 5))
 LATITUDE = os.environ.get('LATITUDE')
 LONGITUDE = os.environ.get('LONGITUDE')
 LANGUAGE = os.environ.get('LANGUAGE', os.environ.get('LANG', 'en')).split('.')[0]
+THEME = os.environ.get('THEME', 'auto').lower()
 
 # Simple in-memory cache
 # Structure: {'timestamp': datetime, 'data': {...}}
@@ -48,9 +49,13 @@ def get_timezone():
 
 def get_theme_mode():
     """
-    Determines if the theme should be 'light' or 'dark' based on sun position.
+    Determines if the theme should be 'light' or 'dark'.
+    Checks THEME env var first, then calculates based on sun position if 'auto'.
     Light mode: Sunrise + 45min < NOW < Sunset - 30min
     """
+    if THEME in ['light', 'dark']:
+        return THEME
+
     if not LATITUDE or not LONGITUDE:
         return 'dark' # Default fallback
         

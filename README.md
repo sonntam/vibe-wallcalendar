@@ -9,7 +9,7 @@ A lightweight, self-hosted wall calendar specifically designed for older hardwar
 
 *   **5-Day Rolling View**: Always shows Yesterday, Today, and the next 3 days.
 *   **Lightweight SSR**: Server-Side Rendered HTML/CSS. Minimal JavaScript. ideal for legacy browsers (Firefox 64+, Android KitKat).
-*   **Auto-Theme**: Automatically switches between Light and Dark mode based on sunrise/sunset at your location.
+*   **Theming**: Automatically switches between Light and Dark mode based on sunrise/sunset, or force a specific theme.
 *   **Multi-Calendar Support**: Fetch events from multiple calendars and assign custom colors/tints to each.
 *   **iCloud Integration**: Connects seamlessly via CalDAV.
 *   **Multi-language**: Supports English (`en`) and German (`de`).
@@ -139,11 +139,16 @@ The application is configured entirely via Environment Variables.
 | `TIMEZONE` | ❌ | `Europe/Berlin` | The timezone for the calendar view (e.g., `America/New_York`). |
 | `DAYS_TO_SHOW` | ❌ | `5` | Number of columns/days to display in the view. |
 | `LANGUAGE` | ❌ | `en` | Interface language (`en` or `de`). |
+| `THEME` | ❌ | `auto` | Force theme: `light`, `dark`, or `auto`. |
 | `LATITUDE` | ❌ | - | Decimal latitude for calculating sunrise/sunset (Auto-Theme). |
 | `LONGITUDE` | ❌ | - | Decimal longitude for calculating sunrise/sunset (Auto-Theme). |
 
-### Note on Auto-Theme
-If `LATITUDE` and `LONGITUDE` are not provided, the application will default to **Dark Mode**. If they are provided, it will switch to **Light Mode** during daylight hours (Sunrise + 45min to Sunset - 30min).
+### Note on Theming
+By default (`THEME=auto`), the application uses **Auto-Theme** logic:
+*   If `LATITUDE` and `LONGITUDE` are provided, it switches to **Light Mode** during daylight hours (Sunrise + 45min to Sunset - 30min).
+*   If coordinates are missing, it defaults to **Dark Mode**.
+
+You can force a specific mode by setting `THEME=light` or `THEME=dark`.
 
 ---
 

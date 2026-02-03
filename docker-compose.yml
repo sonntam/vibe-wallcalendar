@@ -11,10 +11,12 @@ services:
       - secrets.env
     environment:
       - ICLOUD_URL=https://caldav.icloud.com/
-      - CALENDAR_NAME=Familie
+      #- CALENDAR_NAME=Familie
+      - CALENDARS=Privat:DeepSkyBlue,Familie:Gold
       - TIMEZONE=Europe/Berlin
       - TZ=Europe/Berlin
       - DAYS_TO_SHOW=5
       - LATITUDE=52.5200
       - LONGITUDE=13.4050
       - LANGUAGE=de
+      # - THEME=auto # Options: auto, light, dark
