@@ -28,7 +28,7 @@
     <div class="all-day-grid" style="grid-template-columns: repeat({{ columns|length }}, 1fr);">
         {% for event in all_day_events %}
         <div class="all-day-card {% if event.is_left %}cont-left{% endif %} {% if event.is_right %}cont-right{% endif %}"
-             style="grid-column: {{ event.col_start }} / span {{ event.col_span }}; grid-row: {{ event.row }};"
+             style="grid-column: {{ event.col_start }} / span {{ event.col_span }}; grid-row: {{ event.row }}; border-left-color: {{ event.color }};"
              onclick="showDetails(this)"
              data-summary="{{ event.summary }}"
              data-time="{{ event.time_str }}"
@@ -50,6 +50,7 @@
                 {% if col.events %}
                     {% for event in col.events %}
                     <div class="event-card" 
+                         style="border-left-color: {{ event.color }};"
                          onclick="showDetails(this)"
                          data-summary="{{ event.summary }}"
                          data-time="{{ event.time }}"
