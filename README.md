@@ -10,6 +10,7 @@ A lightweight, self-hosted wall calendar specifically designed for older hardwar
 *   **5-Day Rolling View**: Always shows Yesterday, Today, and the next 3 days.
 *   **Lightweight SSR**: Server-Side Rendered HTML/CSS. Minimal JavaScript. ideal for legacy browsers (Firefox 64+, Android KitKat).
 *   **Auto-Theme**: Automatically switches between Light and Dark mode based on sunrise/sunset at your location.
+*   **Multi-Calendar Support**: Fetch events from multiple calendars and assign custom colors/tints to each.
 *   **iCloud Integration**: Connects seamlessly via CalDAV.
 *   **Multi-language**: Supports English (`en`) and German (`de`).
 *   **Details Overlay**: Click on events to see details (location, description, time range).
@@ -55,7 +56,7 @@ services:
       - ICLOUD_USERNAME=your_email@example.com
       - ICLOUD_PASSWORD=your_app_specific_password
       - ICLOUD_URL=https://caldav.icloud.com/
-      - CALENDAR_NAME=Home
+      - CALENDARS="Family:#3d5afe, Work:#ff9800, Sports"
       - TIMEZONE=Europe/Berlin
       - DAYS_TO_SHOW=5
       - LANGUAGE=en
@@ -90,7 +91,7 @@ services:
       - ICLOUD_USERNAME=your_email@example.com
       - ICLOUD_PASSWORD=your_app_specific_password
       - ICLOUD_URL=https://caldav.icloud.com/
-      - CALENDAR_NAME=Home
+      - CALENDARS="Family:#3d5afe, Work:#ff9800, Sports"
       - TIMEZONE=Europe/Berlin
       - DAYS_TO_SHOW=5
       - LANGUAGE=en
@@ -133,7 +134,8 @@ The application is configured entirely via Environment Variables.
 | `ICLOUD_USERNAME` | ✅ | - | Your Apple ID email address. |
 | `ICLOUD_PASSWORD` | ✅ | - | An **App-Specific Password** (Generate at [appleid.apple.com](https://appleid.apple.com)). |
 | `ICLOUD_URL` | ❌ | `https://caldav.icloud.com/` | The CalDAV server URL. |
-| `CALENDAR_NAME` | ❌ | (First found) | The display name of the specific calendar to fetch (e.g., "Home", "Work"). |
+| `CALENDARS` | ❌ | - | List of calendars to fetch with optional colors. Format: `"Name:Color, Name2"`. |
+| `CALENDAR_NAME` | ❌ | (First found) | **Legacy**: The display name of a single calendar to fetch. Used if `CALENDARS` is unset. |
 | `TIMEZONE` | ❌ | `Europe/Berlin` | The timezone for the calendar view (e.g., `America/New_York`). |
 | `DAYS_TO_SHOW` | ❌ | `5` | Number of columns/days to display in the view. |
 | `LANGUAGE` | ❌ | `en` | Interface language (`en` or `de`). |

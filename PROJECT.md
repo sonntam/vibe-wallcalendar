@@ -5,9 +5,9 @@ A lightweight, self-hosted wall calendar specifically designed for older hardwar
 ## Features
 
 *   **5-Day Rolling View**: Always shows Yesterday -> Day after Tomorrow.
-*   **Lightweight**: Server-Side Rendered (SSR) HTML/CSS. No heavy JavaScript frameworks.
-*   **Legacy Support**: Tested/Designed for Firefox 64 and 1280x800 resolution.
-*   **Apple iCloud Integration**: Connects via CalDAV protocol using the `caldav` library.
+*   **Auto-Theme**: Automatically switches between Light and Dark mode based on sunrise/sunset at your location.
+*   **Multi-Calendar Support**: Fetch events from multiple calendars and assign custom colors/tints to each.
+*   **iCloud Integration**: Connects seamlessly via CalDAV.
 *   **Timezone Aware**: Hardcoded to `Europe/Berlin` as requested.
 *   **Dockerized**: Simple `docker-compose` setup.
 
@@ -50,7 +50,7 @@ You can run the pre-built image directly from GitHub Container Registry.
           - secrets.env
         environment:
           - ICLOUD_URL=https://caldav.icloud.com/
-          - CALENDAR_NAME=Home
+          - CALENDARS="Home:#3d5afe, Work:#ff9800"
           - TIMEZONE=Europe/Berlin
           - DAYS_TO_SHOW=5
           - LANGUAGE=de
@@ -103,4 +103,5 @@ Environment variables in `docker-compose.yml`:
 *   `LATITUDE`: (Optional) Latitude for auto-theme switching (e.g., 52.5200).
 *   `LONGITUDE`: (Optional) Longitude for auto-theme switching (e.g., 13.4050).
 *   `LANGUAGE`: (Optional) Language code for UI strings and date formatting (default: `en`, options: `en`, `de`).
-*   `CALENDAR_NAME`: (Optional) The specific calendar to fetch. If omitted, attempts to fetch from all or the primary.
+*   `CALENDARS`: (Optional) List of calendars to fetch with optional colors. Format: `"Name:Color, Name2"`.
+*   `CALENDAR_NAME`: (Legacy) The specific calendar to fetch. Used if `CALENDARS` is unset.
